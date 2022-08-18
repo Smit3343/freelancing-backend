@@ -15,7 +15,7 @@ connectToMongoDb();
 
 const app = express();
 app.use(fileUpload());
-
+app.use(express.static('uploads'));
 
 mongoose.Promise = global.Promise;
 // mongoose.set('debug', true);
