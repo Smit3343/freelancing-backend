@@ -4,8 +4,6 @@ const projectRoute = require('./route/project-route');
 const fileUpload = require('express-fileupload')
 const userRoute = require('./route/user-route');
 const bidRoute = require('./route/bid-route');
-const dotenv = require('dotenv');
-dotenv.config();
 var config = require('./config');
 const mongoose = require('mongoose');
 const connectToMongoDb = require('./db');
