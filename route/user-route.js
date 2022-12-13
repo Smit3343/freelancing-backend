@@ -9,16 +9,16 @@ const config = require('../config');
 
 const route = express.Router();
 
-function comparePassword(password, hashPassword, flagCallback) {
-    bcrypt.compare(password, hashPassword, (err, isMatch) => {
+function comparePassword(password, hashPassword, cb) {
+    bcrypt.compare(password, hashPassword, (err, success) => {
         if (err) {
             console.log(err);
         }
-        return flagCallback(isMatch);
+        else {
+            return cb(success);
+        }
     })
 }
-
-
 
 route.post("/register", [
     body('Email', 'Enter a valid email').isEmail(),
@@ -39,6 +39,7 @@ route.post("/register", [
         if (data != null) {
             return res.json({ status: 'error', error: 'email already taken!' })
         }
+
         const hashPassword = await bcrypt.hash(Obj.Password, 10);
         data = await user.create({
             Email: Obj.Email,
@@ -76,39 +77,12 @@ route.post('/login', (req, res) => {
                 else {
                     return res.json({ status: 'error', error: 'invalid email/password' });
                 }
-            });
+            })
 
         }
     })
 })
-route.post('/changePassword', (req, res) => {
-    const { Password, token } = req.body
-    try {
-        const Obj = jwt.verify(token, config.TOKEN_SECRET)
-        const _id = Obj.id;
-        user.findById(_id, (err, data) => {
-            if (err) {
-                console.log(err);
-            }
-            if (data) {
-                const flag = comparePassword(Password, data.Password);
-                if (flag) {
-                    // const hashPassword=bcrypt.hash(Password);
-                    // user.updateOne({_id}),{
-                    // $set:{password:hashPassword}
-                    // }
-                }
-                else {
-                    res.json({ status: 'error', error: 'invalid password' });
-                }
-            }
-        })
 
-    }
-    catch (error) {
-        return res.json({ status: 'error', error: "invalid token" })
-    }
-})
 route.post('/loggedUser', (req, res) => {
     try {
         const Obj = jwt.verify(req.body.token, config.TOKEN_SECRET)
@@ -119,7 +93,6 @@ route.post('/loggedUser', (req, res) => {
             }
             if (data) {
                 return res.json({ status: 'ok', data: data })
-
             }
         });
     }
